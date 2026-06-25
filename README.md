@@ -136,9 +136,13 @@ The gateway fetches the transaction and bet list from the **Customer Subgraph**,
 
 ## 🛠️ Code Generation
 
-If you modify either of the subgraph schemas, regenerate the boilerplate code structures by navigating into the corresponding subgraph directory and running `gqlgen`:
+If you modify either of the subgraph schemas, regenerate the boilerplate code structures using the provided Makefile commands:
 
 ```bash
-# Inside customer-subgraph or game-subgraph
-go run github.com/99designs/gqlgen generate
+# Generate gqlgen code for both subgraphs
+make generate
+
+# Or generate for a specific subgraph
+make generate-customer
+make generate-game
 ```
