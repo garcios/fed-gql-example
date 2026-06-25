@@ -15,3 +15,7 @@ federation:
   filename: graph/federation.go
   package: graph
   version: 2
+
+models:
+  Customer:
+    model: customer-subgraph/graph/model.Customer

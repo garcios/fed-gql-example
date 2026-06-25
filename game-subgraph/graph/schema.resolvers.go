@@ -8,15 +8,12 @@ package graph
 import (
 	"context"
 	"game-subgraph/graph/model"
+	"game-subgraph/resolvers/queries"
 )
 
 // Game is the resolver for the game field.
 func (r *queryResolver) Game(ctx context.Context, id string) (*model.Game, error) {
-	return &model.Game{
-		ID:           id,
-		Name:         "Premier League Football Match",
-		MarketTypeID: "mt_head_to_head",
-	}, nil
+	return queries.Game(ctx, id)
 }
 
 // Query returns QueryResolver implementation.

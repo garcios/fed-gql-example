@@ -8,12 +8,12 @@ package graph
 import (
 	"context"
 	"customer-subgraph/graph/model"
-	"fmt"
+	"customer-subgraph/resolvers/entities"
 )
 
 // FindCustomerByID is the resolver for the findCustomerByID field.
 func (r *entityResolver) FindCustomerByID(ctx context.Context, id string) (*model.Customer, error) {
-	panic(fmt.Errorf("not implemented: FindCustomerByID - findCustomerByID"))
+	return entities.FindCustomerByID(ctx, id)
 }
 
 // Entity returns EntityResolver implementation.

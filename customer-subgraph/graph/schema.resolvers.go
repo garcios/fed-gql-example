@@ -8,33 +8,25 @@ package graph
 import (
 	"context"
 	"customer-subgraph/graph/model"
+	"customer-subgraph/resolvers/entities"
+	"customer-subgraph/resolvers/queries"
 )
+
+// Transactions is the resolver for the transactions field.
+func (r *customerResolver) Transactions(ctx context.Context, obj *model.Customer) ([]*model.Transaction, error) {
+	return entities.CustomerTransactions(ctx, obj)
+}
 
 // Customer is the resolver for the customer field.
 func (r *queryResolver) Customer(ctx context.Context, id string) (*model.Customer, error) {
-	return &model.Customer{
-		ID: id,
-		Transactions: []*model.Transaction{
-			{
-				CustomerID: id,
-				Bets: []*model.Bet{
-					{
-						ID:     "bet_001",
-						Amount: 120.50,
-						Game:   &model.Game{ID: "game_777"},
-					},
-					{
-						ID:     "bet_002",
-						Amount: 45.00,
-						Game:   &model.Game{ID: "game_888"},
-					},
-				},
-			},
-		},
-	}, nil
+	return queries.Customer(ctx, id)
 }
+
+// Customer returns CustomerResolver implementation.
+func (r *Resolver) Customer() CustomerResolver { return &customerResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type customerResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

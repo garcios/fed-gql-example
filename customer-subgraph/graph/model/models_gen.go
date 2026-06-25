@@ -8,13 +8,6 @@ type Bet struct {
 	Amount float64 `json:"amount"`
 }
 
-type Customer struct {
-	ID           string         `json:"id"`
-	Transactions []*Transaction `json:"transactions"`
-}
-
-func (Customer) IsEntity() {}
-
 type Game struct {
 	ID string `json:"id"`
 }
