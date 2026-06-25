@@ -1,0 +1,27 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.0",
+        import: ["@key", "@external"])
+
+type Customer @key(fields: "id") {
+  id: ID!
+  transactions: [Transaction!]!
+}
+
+type Transaction {
+  customerID: ID!
+  bets: [Bet!]!
+}
+
+type Bet {
+  id: ID!
+  game: Game!
+  amount: Float!
+}
+
+type Game @key(fields: "id", resolvable: false) {
+  id: ID!
+}
+
+type Query {
+  customer(id: ID!): Customer
+}
