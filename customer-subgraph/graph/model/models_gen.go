@@ -8,6 +8,8 @@ type Bet struct {
 	Amount float64 `json:"amount"`
 }
 
+func (Customer) IsEntity() {}
+
 type Game struct {
 	ID string `json:"id"`
 }
