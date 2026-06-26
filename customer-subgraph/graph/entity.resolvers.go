@@ -16,6 +16,11 @@ func (r *entityResolver) FindCustomerByID(ctx context.Context, id string) (*mode
 	return entities.FindCustomerByID(ctx, id)
 }
 
+// FindGameByID is the resolver for the findGameByID field.
+func (r *entityResolver) FindGameByID(ctx context.Context, id string) (*model.Game, error) {
+	return entities.FindGameByID(ctx, id)
+}
+
 // Entity returns EntityResolver implementation.
 func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
 

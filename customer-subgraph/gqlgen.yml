@@ -19,3 +19,13 @@ federation:
 models:
   Customer:
     model: customer-subgraph/graph/model.Customer
+  Transaction:
+    model: customer-subgraph/graph/model.Transaction
+  Bet:
+    model: customer-subgraph/graph/model.Bet
+  Game:
+    model: customer-subgraph/graph/model.Game
+    fields:
+      isBettable:
+        resolver: true
+

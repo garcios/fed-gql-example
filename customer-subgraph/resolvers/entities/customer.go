@@ -17,18 +17,29 @@ func CustomerTransactions(ctx context.Context, obj *model.Customer) ([]*model.Tr
 	return []*model.Transaction{
 		{
 			CustomerID: obj.ID,
-			Bets: []*model.Bet{
-				{
-					ID:     "bet_001",
-					Amount: 120.50,
-					Game:   &model.Game{ID: "game_777"},
-				},
-				{
-					ID:     "bet_002",
-					Amount: 45.00,
-					Game:   &model.Game{ID: "game_888"},
-				},
-			},
 		},
+	}, nil
+}
+
+// TransactionBets resolves the bets field for a Transaction entity.
+func TransactionBets(ctx context.Context, obj *model.Transaction) ([]*model.Bet, error) {
+	return []*model.Bet{
+		{
+			ID:     "bet_001",
+			Amount: 120.50,
+			GameID: "game_777",
+		},
+		{
+			ID:     "bet_002",
+			Amount: 45.00,
+			GameID: "game_888",
+		},
+	}, nil
+}
+
+// BetGame resolves the game field for a Bet entity.
+func BetGame(ctx context.Context, obj *model.Bet) (*model.Game, error) {
+	return &model.Game{
+		ID: obj.GameID,
 	}, nil
 }

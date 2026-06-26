@@ -12,9 +12,19 @@ import (
 	"customer-subgraph/resolvers/queries"
 )
 
+// Game is the resolver for the game field.
+func (r *betResolver) Game(ctx context.Context, obj *model.Bet) (*model.Game, error) {
+	return entities.BetGame(ctx, obj)
+}
+
 // Transactions is the resolver for the transactions field.
 func (r *customerResolver) Transactions(ctx context.Context, obj *model.Customer) ([]*model.Transaction, error) {
 	return entities.CustomerTransactions(ctx, obj)
+}
+
+// IsBettable is the resolver for the isBettable field.
+func (r *gameResolver) IsBettable(ctx context.Context, obj *model.Game) (bool, error) {
+	return entities.GameIsBettable(ctx, obj)
 }
 
 // Customer is the resolver for the customer field.
@@ -22,11 +32,28 @@ func (r *queryResolver) Customer(ctx context.Context, id string) (*model.Custome
 	return queries.Customer(ctx, id)
 }
 
+// Bets is the resolver for the bets field.
+func (r *transactionResolver) Bets(ctx context.Context, obj *model.Transaction) ([]*model.Bet, error) {
+	return entities.TransactionBets(ctx, obj)
+}
+
+// Bet returns BetResolver implementation.
+func (r *Resolver) Bet() BetResolver { return &betResolver{r} }
+
 // Customer returns CustomerResolver implementation.
 func (r *Resolver) Customer() CustomerResolver { return &customerResolver{r} }
+
+// Game returns GameResolver implementation.
+func (r *Resolver) Game() GameResolver { return &gameResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Transaction returns TransactionResolver implementation.
+func (r *Resolver) Transaction() TransactionResolver { return &transactionResolver{r} }
+
+type betResolver struct{ *Resolver }
 type customerResolver struct{ *Resolver }
+type gameResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type transactionResolver struct{ *Resolver }

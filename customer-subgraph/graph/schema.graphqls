@@ -1,6 +1,7 @@
 extend schema
   @link(url: "https://specs.apollo.dev/federation/v2.0",
-        import: ["@key", "@external"])
+        import: ["@key", "@external", "@requires"])
+
 
 type Customer @key(fields: "id") {
   id: ID!
@@ -18,9 +19,12 @@ type Bet {
   amount: Float!
 }
 
-type Game @key(fields: "id", resolvable: false) {
+type Game @key(fields: "id") {
   id: ID!
+  marketTypeID: ID! @external
+  isBettable: Boolean! @requires(fields: "marketTypeID")
 }
+
 
 type Query {
   customer(id: ID!): Customer

@@ -30,9 +30,12 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 type Config = graphql.Config[ResolverRoot, DirectiveRoot, ComplexityRoot]
 
 type ResolverRoot interface {
+	Bet() BetResolver
 	Customer() CustomerResolver
 	Entity() EntityResolver
+	Game() GameResolver
 	Query() QueryResolver
+	Transaction() TransactionResolver
 }
 
 type DirectiveRoot struct {
@@ -52,10 +55,13 @@ type ComplexityRoot struct {
 
 	Entity struct {
 		FindCustomerByID func(childComplexity int, id string) int
+		FindGameByID     func(childComplexity int, id string) int
 	}
 
 	Game struct {
-		ID func(childComplexity int) int
+		ID           func(childComplexity int) int
+		IsBettable   func(childComplexity int) int
+		MarketTypeID func(childComplexity int) int
 	}
 
 	Query struct {
@@ -78,14 +84,24 @@ type ComplexityRoot struct {
 
 // region    ************************** generated!.gotpl **************************
 
+type BetResolver interface {
+	Game(ctx context.Context, obj *model.Bet) (*model.Game, error)
+}
 type CustomerResolver interface {
 	Transactions(ctx context.Context, obj *model.Customer) ([]*model.Transaction, error)
 }
 type EntityResolver interface {
 	FindCustomerByID(ctx context.Context, id string) (*model.Customer, error)
+	FindGameByID(ctx context.Context, id string) (*model.Game, error)
+}
+type GameResolver interface {
+	IsBettable(ctx context.Context, obj *model.Game) (bool, error)
 }
 type QueryResolver interface {
 	Customer(ctx context.Context, id string) (*model.Customer, error)
+}
+type TransactionResolver interface {
+	Bets(ctx context.Context, obj *model.Transaction) ([]*model.Bet, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -149,6 +165,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Entity.FindCustomerByID(childComplexity, args["id"].(string)), true
+	case "Entity.findGameByID":
+		if e.ComplexityRoot.Entity.FindGameByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findGameByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Entity.FindGameByID(childComplexity, args["id"].(string)), true
 
 	case "Game.id":
 		if e.ComplexityRoot.Game.ID == nil {
@@ -156,6 +183,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Game.ID(childComplexity), true
+	case "Game.isBettable":
+		if e.ComplexityRoot.Game.IsBettable == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Game.IsBettable(childComplexity), true
+	case "Game.marketTypeID":
+		if e.ComplexityRoot.Game.MarketTypeID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Game.MarketTypeID(childComplexity), true
 
 	case "Query.customer":
 		if e.ComplexityRoot.Query.Customer == nil {
@@ -344,6 +383,7 @@ union _Entity = Customer | Game
 # fake type to build resolver interfaces for users to implement
 type Entity {
 	findCustomerByID(id: ID!,): Customer!
+	findGameByID(id: ID!,): Game!
 }
 
 type _Service {
@@ -388,6 +428,10 @@ func (ec *executionContext) childFields_Game(ctx context.Context, field graphql.
 	switch field.Name {
 	case "id":
 		return ec.fieldContext_Game_id(ctx, field)
+	case "marketTypeID":
+		return ec.fieldContext_Game_marketTypeID(ctx, field)
+	case "isBettable":
+		return ec.fieldContext_Game_isBettable(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Game", field.Name)
 }
@@ -540,6 +584,20 @@ func (ec *executionContext) field_Entity_findCustomerByID_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Entity_findGameByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -674,7 +732,7 @@ func (ec *executionContext) _Bet_game(ctx context.Context, field graphql.Collect
 			return ec.fieldContext_Bet_game(ctx, field)
 		},
 		func(ctx context.Context) (any, error) {
-			return obj.Game, nil
+			return ec.Resolvers.Bet().Game(ctx, obj)
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.Game) graphql.Marshaler {
@@ -688,8 +746,8 @@ func (ec *executionContext) fieldContext_Bet_game(_ context.Context, field graph
 	fc = &graphql.FieldContext{
 		Object:     "Bet",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return ec.childFields_Game(ctx, field)
 		},
@@ -819,6 +877,50 @@ func (ec *executionContext) fieldContext_Entity_findCustomerByID(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Entity_findGameByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Entity_findGameByID(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Entity().FindGameByID(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.Game) graphql.Marshaler {
+			return ec.marshalNGame2ᚖcustomerᚑsubgraphᚋgraphᚋmodelᚐGame(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Entity_findGameByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Game(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findGameByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Game_id(ctx context.Context, field graphql.CollectedField, obj *model.Game) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -840,6 +942,52 @@ func (ec *executionContext) _Game_id(ctx context.Context, field graphql.Collecte
 }
 func (ec *executionContext) fieldContext_Game_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Game", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _Game_marketTypeID(ctx context.Context, field graphql.CollectedField, obj *model.Game) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Game_marketTypeID(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.MarketTypeID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNID2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Game_marketTypeID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Game", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _Game_isBettable(ctx context.Context, field graphql.CollectedField, obj *model.Game) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Game_isBettable(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Game().IsBettable(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Game_isBettable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Game", field, true, true, errors.New("field of type Boolean does not have child fields"))
 }
 
 func (ec *executionContext) _Query_customer(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1070,7 +1218,7 @@ func (ec *executionContext) _Transaction_bets(ctx context.Context, field graphql
 			return ec.fieldContext_Transaction_bets(ctx, field)
 		},
 		func(ctx context.Context) (any, error) {
-			return obj.Bets, nil
+			return ec.Resolvers.Transaction().Bets(ctx, obj)
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v []*model.Bet) graphql.Marshaler {
@@ -1084,8 +1232,8 @@ func (ec *executionContext) fieldContext_Transaction_bets(_ context.Context, fie
 	fc = &graphql.FieldContext{
 		Object:     "Transaction",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return ec.childFields_Bet(ctx, field)
 		},
@@ -2225,17 +2373,50 @@ func (ec *executionContext) _Bet(ctx context.Context, sel ast.SelectionSet, obj 
 		case "id":
 			out.Values[i] = ec._Bet_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "game":
-			out.Values[i] = ec._Bet_game(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Bet_game(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.IsDeferred() {
+				deferredFieldSet.AddField(field)
+				fieldIndex := len(deferredFieldSet.Values) - 1
+				deferredFieldSet.Concurrently(fieldIndex, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, deferredFieldSet)
+				})
+
+				for _, deferrable := range field.Deferrables {
+					view, ok := deferLabelToView[deferrable.Label]
+					if !ok {
+						view = deferredFieldSet.NewView()
+						deferLabelToView[deferrable.Label] = view
+					}
+					view.AddIndices(fieldIndex)
+				}
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "amount":
 			out.Values[i] = ec._Bet_amount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -2376,6 +2557,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findGameByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findGameByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2412,8 +2615,51 @@ func (ec *executionContext) _Game(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Game_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "marketTypeID":
+			out.Values[i] = ec._Game_marketTypeID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "isBettable":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Game_isBettable(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.IsDeferred() {
+				deferredFieldSet.AddField(field)
+				fieldIndex := len(deferredFieldSet.Values) - 1
+				deferredFieldSet.Concurrently(fieldIndex, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, deferredFieldSet)
+				})
+
+				for _, deferrable := range field.Deferrables {
+					view, ok := deferLabelToView[deferrable.Label]
+					if !ok {
+						view = deferredFieldSet.NewView()
+						deferLabelToView[deferrable.Label] = view
+					}
+					view.AddIndices(fieldIndex)
+				}
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2571,13 +2817,46 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 		case "customerID":
 			out.Values[i] = ec._Transaction_customerID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "bets":
-			out.Values[i] = ec._Transaction_bets(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Transaction_bets(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.IsDeferred() {
+				deferredFieldSet.AddField(field)
+				fieldIndex := len(deferredFieldSet.Values) - 1
+				deferredFieldSet.Concurrently(fieldIndex, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, deferredFieldSet)
+				})
+
+				for _, deferrable := range field.Deferrables {
+					view, ok := deferLabelToView[deferrable.Label]
+					if !ok {
+						view = deferredFieldSet.NewView()
+						deferLabelToView[deferrable.Label] = view
+					}
+					view.AddIndices(fieldIndex)
+				}
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3115,6 +3394,10 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 		}
 	}
 	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) marshalNGame2customerᚑsubgraphᚋgraphᚋmodelᚐGame(ctx context.Context, sel ast.SelectionSet, v model.Game) graphql.Marshaler {
+	return ec._Game(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNGame2ᚖcustomerᚑsubgraphᚋgraphᚋmodelᚐGame(ctx context.Context, sel ast.SelectionSet, v *model.Game) graphql.Marshaler {

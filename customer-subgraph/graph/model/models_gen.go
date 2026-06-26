@@ -2,24 +2,5 @@
 
 package model
 
-type Bet struct {
-	ID     string  `json:"id"`
-	Game   *Game   `json:"game"`
-	Amount float64 `json:"amount"`
-}
-
-func (Customer) IsEntity() {}
-
-type Game struct {
-	ID string `json:"id"`
-}
-
-func (Game) IsEntity() {}
-
 type Query struct {
-}
-
-type Transaction struct {
-	CustomerID string `json:"customerID"`
-	Bets       []*Bet `json:"bets"`
 }
