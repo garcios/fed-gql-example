@@ -26,6 +26,6 @@ models:
   Game:
     model: customer-subgraph/graph/model.Game
     fields:
-      isBettable:
+      isMatch:
         resolver: true
 

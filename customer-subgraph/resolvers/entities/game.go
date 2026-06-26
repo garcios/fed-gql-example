@@ -12,8 +12,15 @@ func FindGameByID(ctx context.Context, id string) (*model.Game, error) {
 	}, nil
 }
 
-// GameIsBettable resolves the isBettable field for a Game entity.
-func GameIsBettable(ctx context.Context, obj *model.Game) (bool, error) {
-	// A sporting game is considered bettable if the market type is not standard or empty.
-	return obj.MarketTypeID != "" && obj.MarketTypeID != "mt_standard", nil
+// GameIsMatch resolves the isMatch field for a Game entity.
+func GameIsMatch(ctx context.Context, obj *model.Game) (bool, error) {
+	switch obj.MarketTypeID {
+	case "mt_match_winner", "mt_point_spread", "mt_total_points":
+		return true, nil
+	case "multi_runner":
+		return false, nil
+	default:
+		return false, nil
+	}
+
 }

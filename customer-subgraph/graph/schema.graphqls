@@ -22,7 +22,7 @@ type Bet {
 type Game @key(fields: "id") {
   id: ID!
   marketTypeID: ID! @external
-  isBettable: Boolean! @requires(fields: "marketTypeID")
+  isMatch: Boolean! @requires(fields: "marketTypeID")
 }
 
 

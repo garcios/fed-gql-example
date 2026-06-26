@@ -22,9 +22,9 @@ func (r *customerResolver) Transactions(ctx context.Context, obj *model.Customer
 	return entities.CustomerTransactions(ctx, obj)
 }
 
-// IsBettable is the resolver for the isBettable field.
-func (r *gameResolver) IsBettable(ctx context.Context, obj *model.Game) (bool, error) {
-	return entities.GameIsBettable(ctx, obj)
+// IsMatch is the resolver for the isMatch field.
+func (r *gameResolver) IsMatch(ctx context.Context, obj *model.Game) (bool, error) {
+	return entities.GameIsMatch(ctx, obj)
 }
 
 // Customer is the resolver for the customer field.

@@ -34,6 +34,11 @@ func TransactionBets(ctx context.Context, obj *model.Transaction) ([]*model.Bet,
 			Amount: 45.00,
 			GameID: "game_888",
 		},
+		{
+			ID:     "bet_003",
+			Amount: 100.00,
+			GameID: "game_999",
+		},
 	}, nil
 }
 

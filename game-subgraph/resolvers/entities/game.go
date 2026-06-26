@@ -17,8 +17,11 @@ func FindGameByID(ctx context.Context, id string) (*model.Game, error) {
 	case "game_888":
 		name = "World Cup Tennis Open"
 		marketTypeID = "mt_match_winner"
+	case "game_999":
+		name = "F1 racing"
+		marketTypeID = "multi_runner"
 	default:
-		name = "Generic Sporting Event"
+		name = "General Sporting Event"
 		marketTypeID = "mt_standard"
 	}
 

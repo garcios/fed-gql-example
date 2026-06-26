@@ -60,7 +60,7 @@ type ComplexityRoot struct {
 
 	Game struct {
 		ID           func(childComplexity int) int
-		IsBettable   func(childComplexity int) int
+		IsMatch      func(childComplexity int) int
 		MarketTypeID func(childComplexity int) int
 	}
 
@@ -95,7 +95,7 @@ type EntityResolver interface {
 	FindGameByID(ctx context.Context, id string) (*model.Game, error)
 }
 type GameResolver interface {
-	IsBettable(ctx context.Context, obj *model.Game) (bool, error)
+	IsMatch(ctx context.Context, obj *model.Game) (bool, error)
 }
 type QueryResolver interface {
 	Customer(ctx context.Context, id string) (*model.Customer, error)
@@ -183,12 +183,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Game.ID(childComplexity), true
-	case "Game.isBettable":
-		if e.ComplexityRoot.Game.IsBettable == nil {
+	case "Game.isMatch":
+		if e.ComplexityRoot.Game.IsMatch == nil {
 			break
 		}
 
-		return e.ComplexityRoot.Game.IsBettable(childComplexity), true
+		return e.ComplexityRoot.Game.IsMatch(childComplexity), true
 	case "Game.marketTypeID":
 		if e.ComplexityRoot.Game.MarketTypeID == nil {
 			break
@@ -430,8 +430,8 @@ func (ec *executionContext) childFields_Game(ctx context.Context, field graphql.
 		return ec.fieldContext_Game_id(ctx, field)
 	case "marketTypeID":
 		return ec.fieldContext_Game_marketTypeID(ctx, field)
-	case "isBettable":
-		return ec.fieldContext_Game_isBettable(ctx, field)
+	case "isMatch":
+		return ec.fieldContext_Game_isMatch(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Game", field.Name)
 }
@@ -967,16 +967,16 @@ func (ec *executionContext) fieldContext_Game_marketTypeID(_ context.Context, fi
 	return graphql.NewScalarFieldContext("Game", field, false, false, errors.New("field of type ID does not have child fields"))
 }
 
-func (ec *executionContext) _Game_isBettable(ctx context.Context, field graphql.CollectedField, obj *model.Game) (ret graphql.Marshaler) {
+func (ec *executionContext) _Game_isMatch(ctx context.Context, field graphql.CollectedField, obj *model.Game) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
 		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return ec.fieldContext_Game_isBettable(ctx, field)
+			return ec.fieldContext_Game_isMatch(ctx, field)
 		},
 		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.Game().IsBettable(ctx, obj)
+			return ec.Resolvers.Game().IsMatch(ctx, obj)
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
@@ -986,7 +986,7 @@ func (ec *executionContext) _Game_isBettable(ctx context.Context, field graphql.
 		true,
 	)
 }
-func (ec *executionContext) fieldContext_Game_isBettable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Game_isMatch(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Game", field, true, true, errors.New("field of type Boolean does not have child fields"))
 }
 
@@ -2622,7 +2622,7 @@ func (ec *executionContext) _Game(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "isBettable":
+		case "isMatch":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -2631,7 +2631,7 @@ func (ec *executionContext) _Game(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Game_isBettable(ctx, field, obj)
+				res = ec._Game_isMatch(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
