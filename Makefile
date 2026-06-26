@@ -1,4 +1,4 @@
-.PHONY: start-customer start-game start-all help generate generate-customer generate-game rover-dev
+.PHONY: start-customer start-game start-all help generate generate-customer generate-game rover-dev compose-supergraph verify-supergraph
 
 help:
 	@echo "Available commands:"
@@ -9,6 +9,8 @@ help:
 	@echo "  make generate       - Generate gqlgen code for all subgraphs"
 	@echo "  make generate-customer - Generate gqlgen code for Customer Subgraph"
 	@echo "  make generate-game     - Generate gqlgen code for Game Subgraph"
+	@echo "  make compose-supergraph - Compose the supergraph schema and save to supergraph.graphql"
+	@echo "  make verify-supergraph  - Verify that the subgraphs compose into a valid supergraph"
 
 start-customer:
 	@echo "Starting Customer Subgraph..."
@@ -34,3 +36,13 @@ generate-customer:
 generate-game:
 	@echo "Generating gqlgen code for Game Subgraph..."
 	cd game-subgraph && go run github.com/99designs/gqlgen generate
+
+compose-supergraph:
+	@echo "Composing supergraph schema..."
+	rover supergraph compose --config ./supergraph-config.yaml > supergraph.graphql
+	@echo "Supergraph schema successfully composed to supergraph.graphql"
+
+verify-supergraph:
+	@echo "Verifying subgraphs composition..."
+	rover supergraph compose --config ./supergraph-config.yaml > /dev/null
+	@echo "All subgraphs are valid and composed successfully!"
