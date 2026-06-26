@@ -13,7 +13,7 @@ import (
 
 // Game is the resolver for the game field.
 func (r *queryResolver) Game(ctx context.Context, id string) (*model.Game, error) {
-	return queries.Game(ctx, id)
+	return queries.Game(ctx, r.GameAPI, id)
 }
 
 // Query returns QueryResolver implementation.

@@ -13,7 +13,7 @@ import (
 
 // FindGameByID is the resolver for the findGameByID field.
 func (r *entityResolver) FindGameByID(ctx context.Context, id string) (*model.Game, error) {
-	return entities.FindGameByID(ctx, id)
+	return entities.FindGameByID(ctx, r.GameAPI, id)
 }
 
 // Entity returns EntityResolver implementation.

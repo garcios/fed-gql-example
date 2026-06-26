@@ -2,48 +2,27 @@ package entities
 
 import (
 	"context"
+	"customer-subgraph/datasources"
 	"customer-subgraph/graph/model"
 )
 
 // FindCustomerByID resolves a Customer entity by its unique ID.
-func FindCustomerByID(ctx context.Context, id string) (*model.Customer, error) {
-	return &model.Customer{
-		ID: id,
-	}, nil
+func FindCustomerByID(ctx context.Context, api *datasources.MockAPI, id string) (*model.Customer, error) {
+	return api.GetCustomer(ctx, id)
 }
 
 // CustomerTransactions resolves the transactions field for a Customer entity.
-func CustomerTransactions(ctx context.Context, obj *model.Customer) ([]*model.Transaction, error) {
-	return []*model.Transaction{
-		{
-			CustomerID: obj.ID,
-		},
-	}, nil
+func CustomerTransactions(ctx context.Context, api *datasources.MockAPI, obj *model.Customer) ([]*model.Transaction, error) {
+	return api.GetTransactions(ctx, obj.ID)
 }
 
 // TransactionBets resolves the bets field for a Transaction entity.
-func TransactionBets(ctx context.Context, obj *model.Transaction) ([]*model.Bet, error) {
-	return []*model.Bet{
-		{
-			ID:     "bet_001",
-			Amount: 120.50,
-			GameID: "game_777",
-		},
-		{
-			ID:     "bet_002",
-			Amount: 45.00,
-			GameID: "game_888",
-		},
-		{
-			ID:     "bet_003",
-			Amount: 100.00,
-			GameID: "game_999",
-		},
-	}, nil
+func TransactionBets(ctx context.Context, api *datasources.MockAPI, obj *model.Transaction) ([]*model.Bet, error) {
+	return api.GetBets(ctx, obj.CustomerID)
 }
 
 // BetGame resolves the game field for a Bet entity.
-func BetGame(ctx context.Context, obj *model.Bet) (*model.Game, error) {
+func BetGame(ctx context.Context, api *datasources.MockAPI, obj *model.Bet) (*model.Game, error) {
 	return &model.Game{
 		ID: obj.GameID,
 	}, nil

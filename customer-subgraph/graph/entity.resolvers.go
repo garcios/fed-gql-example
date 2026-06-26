@@ -13,12 +13,12 @@ import (
 
 // FindCustomerByID is the resolver for the findCustomerByID field.
 func (r *entityResolver) FindCustomerByID(ctx context.Context, id string) (*model.Customer, error) {
-	return entities.FindCustomerByID(ctx, id)
+	return entities.FindCustomerByID(ctx, r.CustomerAPI, id)
 }
 
 // FindGameByID is the resolver for the findGameByID field.
 func (r *entityResolver) FindGameByID(ctx context.Context, id string) (*model.Game, error) {
-	return entities.FindGameByID(ctx, id)
+	return entities.FindGameByID(ctx, r.CustomerAPI, id)
 }
 
 // Entity returns EntityResolver implementation.

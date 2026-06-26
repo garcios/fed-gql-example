@@ -14,27 +14,27 @@ import (
 
 // Game is the resolver for the game field.
 func (r *betResolver) Game(ctx context.Context, obj *model.Bet) (*model.Game, error) {
-	return entities.BetGame(ctx, obj)
+	return entities.BetGame(ctx, r.CustomerAPI, obj)
 }
 
 // Transactions is the resolver for the transactions field.
 func (r *customerResolver) Transactions(ctx context.Context, obj *model.Customer) ([]*model.Transaction, error) {
-	return entities.CustomerTransactions(ctx, obj)
+	return entities.CustomerTransactions(ctx, r.CustomerAPI, obj)
 }
 
 // IsMatch is the resolver for the isMatch field.
 func (r *gameResolver) IsMatch(ctx context.Context, obj *model.Game) (bool, error) {
-	return entities.GameIsMatch(ctx, obj)
+	return entities.GameIsMatch(ctx, r.CustomerAPI, obj)
 }
 
 // Customer is the resolver for the customer field.
 func (r *queryResolver) Customer(ctx context.Context, id string) (*model.Customer, error) {
-	return queries.Customer(ctx, id)
+	return queries.Customer(ctx, r.CustomerAPI, id)
 }
 
 // Bets is the resolver for the bets field.
 func (r *transactionResolver) Bets(ctx context.Context, obj *model.Transaction) ([]*model.Bet, error) {
-	return entities.TransactionBets(ctx, obj)
+	return entities.TransactionBets(ctx, r.CustomerAPI, obj)
 }
 
 // Bet returns BetResolver implementation.

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"customer-subgraph/datasources"
 	"customer-subgraph/graph"
 	"log"
 	"net/http"
@@ -18,7 +19,12 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	customerAPI := datasources.NewMockAPI()
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{
+			CustomerAPI: customerAPI,
+		},
+	}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
