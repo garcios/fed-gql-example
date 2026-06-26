@@ -88,11 +88,12 @@ query GetCustomerActivityRecord {
           id
           name
           marketTypeID
+          isMatch
         }
       }
     }
   }
-}
+} 
 ```
 
 #### Expected Federated Response
@@ -112,7 +113,8 @@ The gateway fetches the transaction and bet list from the **Customer Subgraph**,
               "game": {
                 "id": "game_777",
                 "name": "Championship Basketball Finals",
-                "marketTypeID": "mt_point_spread"
+                "marketTypeID": "mt_point_spread",
+                "isMatch": true
               }
             },
             {
@@ -121,7 +123,18 @@ The gateway fetches the transaction and bet list from the **Customer Subgraph**,
               "game": {
                 "id": "game_888",
                 "name": "World Cup Tennis Open",
-                "marketTypeID": "mt_match_winner"
+                "marketTypeID": "mt_match_winner",
+                "isMatch": true
+              }
+            },
+            {
+              "id": "bet_003",
+              "amount": 100,
+              "game": {
+                "id": "game_999",
+                "name": "F1 racing",
+                "marketTypeID": "multi_runner",
+                "isMatch": false
               }
             }
           ]
