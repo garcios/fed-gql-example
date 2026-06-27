@@ -22,4 +22,3 @@ type Game struct {
 }
 
 func (Game) IsEntity() {}
-

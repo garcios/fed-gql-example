@@ -23,6 +23,11 @@ models:
     model: customer-subgraph/graph/model.Transaction
   Bet:
     model: customer-subgraph/graph/model.Bet
+    fields:
+      amount:
+        resolver: true
+      gameID:
+        resolver: true
   Game:
     model: customer-subgraph/graph/model.Game
     fields:

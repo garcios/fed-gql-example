@@ -17,6 +17,11 @@ func (r *betResolver) Game(ctx context.Context, obj *model.Bet) (*model.Game, er
 	return entities.BetGame(ctx, r.CustomerAPI, obj)
 }
 
+// Amount is the resolver for the amount field.
+func (r *betResolver) Amount(ctx context.Context, obj *model.Bet) (float64, error) {
+	return obj.Amount, nil
+}
+
 // Transactions is the resolver for the transactions field.
 func (r *customerResolver) Transactions(ctx context.Context, obj *model.Customer) ([]*model.Transaction, error) {
 	return entities.CustomerTransactions(ctx, r.CustomerAPI, obj)
