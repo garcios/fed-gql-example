@@ -3,6 +3,7 @@ package main
 import (
 	"game-subgraph/datasources"
 	"game-subgraph/graph"
+	"game-subgraph/resolvers"
 	"log"
 	"net/http"
 	"os"
@@ -21,7 +22,7 @@ func main() {
 
 	gameAPI := datasources.NewMockAPI()
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
-		Resolvers: &graph.Resolver{
+		Resolvers: &resolvers.Resolver{
 			GameAPI: gameAPI,
 		},
 	}))
