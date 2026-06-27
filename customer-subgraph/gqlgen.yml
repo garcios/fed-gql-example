@@ -7,10 +7,10 @@ exec:
 model:
   filename: graph/model/models_gen.go
   package: model
-resolver:
-  layout: follow-schema
-  dir: graph
-  package: graph
+# resolver:
+#   dir: resolvers
+#   package: resolvers
+#   filename: resolvers/schema.resolvers.go
 federation:
   filename: graph/federation.go
   package: graph

@@ -3,6 +3,7 @@ package main
 import (
 	"customer-subgraph/datasources"
 	"customer-subgraph/graph"
+	"customer-subgraph/resolvers"
 	"log"
 	"net/http"
 	"os"
@@ -21,7 +22,7 @@ func main() {
 
 	customerAPI := datasources.NewMockAPI()
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
-		Resolvers: &graph.Resolver{
+		Resolvers: &resolvers.Resolver{
 			CustomerAPI: customerAPI,
 		},
 	}))
